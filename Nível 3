@@ -1,0 +1,147 @@
+#include <stdio.h>
+#include <string.h>
+
+#define NUM_CARTAS 2
+
+// Estrutura que representa uma carta
+typedef struct {
+    char estado;
+    char codigo[4];
+    char nomeCidade[50];
+    int populacao;
+    float area;
+    float pib;
+    int pontosTuristicos;
+} Carta;
+
+// Função para exibir uma carta
+void exibirCarta(Carta carta, int numero) {
+    printf("\nCarta %d:\n", numero);
+    printf("Estado: %c\n", carta.estado);
+    printf("Código: %s\n", carta.codigo);
+    printf("Nome da Cidade: %s\n", carta.nomeCidade);
+    printf("População: %d\n", carta.populacao);
+    printf("Área: %.2f km²\n", carta.area);
+    printf("PIB: %.2f bilhões de reais\n", carta.pib);
+    printf("Número de Pontos Turísticos: %d\n", carta.pontosTuristicos);
+}
+
+// Função auxiliar para comparar dois inteiros e retornar a carta vencedora (0, 1 ou -1 em caso de empate)
+int compararInt(int val1, int val2) {
+    return (val1 > val2) ? 0 : (val2 > val1) ? 1 : -1;
+}
+
+// Função auxiliar para comparar dois floats e retornar a carta vencedora (0, 1 ou -1 em caso de empate)
+int compararFloat(float val1, float val2) {
+    return (val1 > val2) ? 0 : (val2 > val1) ? 1 : -1;
+}
+
+// Função auxiliar para comparar densidade populacional (menor vence)
+int compararDensidade(Carta c1, Carta c2) {
+    float d1 = c1.populacao / c1.area;
+    float d2 = c2.populacao / c2.area;
+    return (d1 < d2) ? 0 : (d2 < d1) ? 1 : -1;
+}
+
+// Exibe o resultado com base na carta vencedora
+void exibirResultado(int vencedor, char atributo[]) {
+    if (vencedor == -1)
+        printf("Empate! Ambas as cartas estão equilibradas no critério: %s 👏\n", atributo);
+    else
+        printf("Carta %d venceu no critério: %s 🏆\n", vencedor + 1, atributo);
+}
+
+int main() {
+    Carta cartas[NUM_CARTAS];
+
+    // Cadastro das cartas
+    for (int i = 0; i < NUM_CARTAS; i++) {
+        printf("Digite os dados da Carta %d:\n", i + 1);
+        printf("Estado (letra de A a H): ");
+        scanf(" %c", &cartas[i].estado);
+
+        printf("Código da Carta (ex: A01): ");
+        scanf("%s", cartas[i].codigo);
+
+        printf("Nome da Cidade: ");
+        scanf(" %[^\n]", cartas[i].nomeCidade);
+
+        printf("População: ");
+        scanf("%d", &cartas[i].populacao);
+
+        printf("Área (em km²): ");
+        scanf("%f", &cartas[i].area);
+
+        printf("PIB (em bilhões de reais): ");
+        scanf("%f", &cartas[i].pib);
+
+        printf("Número de Pontos Turísticos: ");
+        scanf("%d", &cartas[i].pontosTuristicos);
+        printf("\n");
+    }
+
+    // Exibir cartas
+    for (int i = 0; i < NUM_CARTAS; i++) {
+        exibirCarta(cartas[i], i + 1);
+    }
+
+    // Menu dinâmico com múltiplos atributos
+    int escolha1, escolha2;
+    printf("\n=== MENU DE COMPARAÇÃO AVANÇADA ===\n");
+    printf("Escolha dois atributos para comparar:\n");
+    printf("1 - População\n");
+    printf("2 - Área\n");
+    printf("3 - PIB\n");
+    printf("4 - Pontos Turísticos\n");
+    printf("5 - Densidade Populacional (menor vence)\n");
+
+    printf("Primeiro atributo: ");
+    scanf("%d", &escolha1);
+    printf("Segundo atributo: ");
+    scanf("%d", &escolha2);
+
+    int resultado1 = -1, resultado2 = -1;
+
+    // Comparação do primeiro atributo
+    switch (escolha1) {
+        case 1: resultado1 = compararInt(cartas[0].populacao, cartas[1].populacao); break;
+        case 2: resultado1 = compararFloat(cartas[0].area, cartas[1].area); break;
+        case 3: resultado1 = compararFloat(cartas[0].pib, cartas[1].pib); break;
+        case 4: resultado1 = compararInt(cartas[0].pontosTuristicos, cartas[1].pontosTuristicos); break;
+        case 5: resultado1 = compararDensidade(cartas[0], cartas[1]); break;
+        default: printf("Opção inválida!\n"); return 1;
+    }
+
+    // Comparação do segundo atributo
+    switch (escolha2) {
+        case 1: resultado2 = compararInt(cartas[0].populacao, cartas[1].populacao); break;
+        case 2: resultado2 = compararFloat(cartas[0].area, cartas[1].area); break;
+        case 3: resultado2 = compararFloat(cartas[0].pib, cartas[1].pib); break;
+        case 4: resultado2 = compararInt(cartas[0].pontosTuristicos, cartas[1].pontosTuristicos); break;
+        case 5: resultado2 = compararDensidade(cartas[0], cartas[1]); break;
+        default: printf("Opção inválida!\n"); return 1;
+    }
+
+    // Lógica complexa de decisão
+    int vencedorFinal;
+    if (resultado1 == resultado2) {
+        vencedorFinal = resultado1;
+    } else if (resultado1 == -1) {
+        vencedorFinal = resultado2;
+    } else if (resultado2 == -1) {
+        vencedorFinal = resultado1;
+    } else {
+        // desempate: Carta 1 ganha se venceu ambos, senão Carta 2
+        vencedorFinal = (resultado1 == 0 && resultado2 == 0) ? 0 :
+                        (resultado1 == 1 && resultado2 == 1) ? 1 : -1;
+    }
+
+    // Resultado
+    printf("\n>>> RESULTADO FINAL <<<\n");
+    if (vencedorFinal == -1)
+        printf("Empate total! As cartas estão fortemente equilibradas nos dois critérios! 🎯\n");
+    else
+        printf("Carta %d venceu com destaque nos dois critérios escolhidos! 🥇\n", vencedorFinal + 1);
+
+    return 0;
+}
